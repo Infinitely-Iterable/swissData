@@ -1,8 +1,11 @@
+# includes missingNo code
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import pandas as pd
 import matplotlib.pyplot as plt
 from ttkthemes import ThemedTk
+from itertools import combinations
 
 
 # Function to load CSV file
@@ -12,7 +15,6 @@ def load_csv():
         global df
         df = pd.read_csv(file_path)
         messagebox.showinfo("Success", "CSV file loaded successfully!")
-        show_column_info()  # Show column info after loading
     else:
         messagebox.showwarning("Warning", "No file selected!")
 
@@ -197,26 +199,132 @@ def export_filtered_data():
         messagebox.showwarning("Warning", "No filtered data to export!")
 
 
-# Function to show current column names and data types
-def show_column_info():
+# Reverse Calculator: Function to find combinations that sum to a target value
+def reverse_calculator():
     if df is not None:
-        columns_window = tk.Toplevel(root)
-        columns_window.title("Column Names and Data Types")
-        columns_text = tk.Text(columns_window, wrap=tk.NONE)
-        columns_text.insert(tk.END, df.dtypes.to_string())
-        columns_text.pack(expand=True, fill=tk.BOTH)
+
+        def apply_reverse_calculator():
+            target_value = float(target_entry.get())
+            num_operands = int(num_operands_entry.get())
+            tolerance = float(tolerance_entry.get()) / 100
+
+            exclude_first = exclude_first_var.get()
+            columns = (
+                df.columns.tolist()[1:] if exclude_first == "y" else df.columns.tolist()
+            )
+            per_column = per_column_var.get() == "y"
+
+            finder = CombinationFinder(df, columns, per_column)
+            results = finder.find_combinations(target_value, num_operands, tolerance)
+            finder.display_results(results)
+
+        reverse_calc_window = tk.Toplevel(root)
+        reverse_calc_window.title("Reverse Calculator")
+
+        tk.Label(reverse_calc_window, text="Target Value:").pack()
+        target_entry = tk.Entry(reverse_calc_window)
+        target_entry.pack()
+
+        tk.Label(reverse_calc_window, text="Number of Operands (2 or 3):").pack()
+        num_operands_entry = tk.Entry(reverse_calc_window)
+        num_operands_entry.pack()
+
+        tk.Label(
+            reverse_calc_window, text="Tolerance Percentage (e.g., 10 for 10%):"
+        ).pack()
+        tolerance_entry = tk.Entry(reverse_calc_window)
+        tolerance_entry.pack()
+
+        exclude_first_var = tk.StringVar(value="y")
+        tk.Label(reverse_calc_window, text="Exclude First Column? (y/n):").pack()
+        tk.Entry(reverse_calc_window, textvariable=exclude_first_var).pack()
+
+        per_column_var = tk.StringVar(value="n")
+        tk.Label(reverse_calc_window, text="Search Per Column? (y/n):").pack()
+        tk.Entry(reverse_calc_window, textvariable=per_column_var).pack()
+
+        tk.Button(
+            reverse_calc_window,
+            text="Find Combinations",
+            command=apply_reverse_calculator,
+        ).pack()
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
+
+
+# Reverse Calculator: Supporting classes
+class CombinationFinder:
+    def __init__(self, dataframe, columns=None, per_column=False):
+        self.df = dataframe
+        self.per_column = per_column
+        if columns:
+            self.df = self.df[columns]
+
+    def find_combinations(self, target_value, num_operands, tolerance):
+        results = []
+        if self.per_column:
+            for col in self.df.columns:
+                results.extend(
+                    self._find_combinations_in_column(
+                        target_value, num_operands, tolerance, col
+                    )
+                )
+        else:
+            results.extend(
+                self._find_combinations_across_columns(
+                    target_value, num_operands, tolerance
+                )
+            )
+        return results
+
+    def _find_combinations_in_column(self, target_value, num_operands, tolerance, col):
+        entries = [(idx, row[col]) for idx, row in self.df.iterrows()]
+        results = []
+        for combo in combinations(entries, num_operands):
+            sum_val = sum(item[1] for item in combo)
+            if abs(sum_val - target_value) <= tolerance * target_value:
+                result_entry = {"column": col, "sum": sum_val}
+                for i, (index, value) in enumerate(combo):
+                    result_entry[f"index{i+1}"] = index
+                    result_entry[f"value{i+1}"] = value
+                results.append(result_entry)
+        return results
+
+    def _find_combinations_across_columns(self, target_value, num_operands, tolerance):
+        entries = [
+            (idx, row[col])
+            for idx, row in self.df.iterrows()
+            for col in self.df.columns
+        ]
+        results = []
+        for combo in combinations(entries, num_operands):
+            sum_val = sum(item[1] for item in combo)
+            if abs(sum_val - target_value) <= tolerance * target_value:
+                result_entry = {"sum": sum_val}
+                for i, (index, value) in enumerate(combo):
+                    result_entry[f"index{i+1}"] = index
+                    result_entry[f"value{i+1}"] = value
+                results.append(result_entry)
+        return results
+
+    def display_results(self, results):
+        if results:
+            results_window = tk.Toplevel(root)
+            results_window.title("Combination Results")
+            results_text = tk.Text(results_window, wrap=tk.NONE)
+            results_text.insert(tk.END, pd.DataFrame(results).to_string())
+            results_text.pack(expand=True, fill=tk.BOTH)
+        else:
+            messagebox.showinfo("Info", "No combinations found within tolerance.")
 
 
 # Create main application window with macOS aesthetic
 root = ThemedTk(theme="aquativo")
 root.title("Data Analysis Swiss Army Tool")
-root.geometry("400x600")
+root.geometry("400x700")
 
 # Buttons for the different tools
 ttk.Button(root, text="Load CSV", command=load_csv).pack(pady=10)
-ttk.Button(root, text="Show Column Info", command=show_column_info).pack(pady=10)
 ttk.Button(root, text="Show First 5 Rows", command=show_head).pack(pady=10)
 ttk.Button(root, text="Describe Dataset", command=describe_data).pack(pady=10)
 ttk.Button(root, text="Filter Rows", command=filter_rows).pack(pady=10)
@@ -234,6 +342,7 @@ ttk.Button(root, text="Group By and Aggregate", command=group_by_and_aggregate).
 ttk.Button(root, text="Export Filtered Data", command=export_filtered_data).pack(
     pady=10
 )
+ttk.Button(root, text="Reverse Calculator", command=reverse_calculator).pack(pady=10)
 
 # Global variable to store the dataframe and filtered dataframe
 df = None
