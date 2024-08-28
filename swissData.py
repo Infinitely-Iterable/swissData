@@ -200,11 +200,8 @@ def export_filtered_data():
 # Function to show current column names and data types
 def show_column_info():
     if df is not None:
-        columns_window = tk.Toplevel(root)
-        columns_window.title("Column Names and Data Types")
-        columns_text = tk.Text(columns_window, wrap=tk.NONE)
-        columns_text.insert(tk.END, df.dtypes.to_string())
-        columns_text.pack(expand=True, fill=tk.BOTH)
+        column_info_text.delete(1.0, tk.END)  # Clear previous content
+        column_info_text.insert(tk.END, df.dtypes.to_string())
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
 
@@ -212,28 +209,43 @@ def show_column_info():
 # Create main application window with macOS aesthetic
 root = ThemedTk(theme="aquativo")
 root.title("Data Analysis Swiss Army Tool")
-root.geometry("400x600")
+root.geometry("600x600")
+
+# Create a frame for the column info
+column_info_frame = tk.Frame(root)
+column_info_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+# Label for column info section
+tk.Label(column_info_frame, text="Column Names and Data Types:").pack()
+
+# Text widget for displaying column names and data types
+column_info_text = tk.Text(column_info_frame, wrap=tk.NONE, height=10)
+column_info_text.pack(expand=True, fill=tk.BOTH)
 
 # Buttons for the different tools
-ttk.Button(root, text="Load CSV", command=load_csv).pack(pady=10)
-ttk.Button(root, text="Show Column Info", command=show_column_info).pack(pady=10)
-ttk.Button(root, text="Show First 5 Rows", command=show_head).pack(pady=10)
-ttk.Button(root, text="Describe Dataset", command=describe_data).pack(pady=10)
-ttk.Button(root, text="Filter Rows", command=filter_rows).pack(pady=10)
-ttk.Button(root, text="Plot Column", command=plot_column).pack(pady=10)
-ttk.Button(root, text="Show Correlation Matrix", command=show_correlation_matrix).pack(
-    pady=10
-)
-ttk.Button(root, text="Show Value Counts", command=show_value_counts).pack(pady=10)
+button_frame = tk.Frame(root)
+button_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+ttk.Button(button_frame, text="Load CSV", command=load_csv).pack(pady=5)
+ttk.Button(button_frame, text="Show First 5 Rows", command=show_head).pack(pady=5)
+ttk.Button(button_frame, text="Describe Dataset", command=describe_data).pack(pady=5)
+ttk.Button(button_frame, text="Filter Rows", command=filter_rows).pack(pady=5)
+ttk.Button(button_frame, text="Plot Column", command=plot_column).pack(pady=5)
 ttk.Button(
-    root, text="Summarize Missing Values", command=summarize_missing_values
-).pack(pady=10)
-ttk.Button(root, text="Group By and Aggregate", command=group_by_and_aggregate).pack(
-    pady=10
+    button_frame, text="Show Correlation Matrix", command=show_correlation_matrix
+).pack(pady=5)
+ttk.Button(button_frame, text="Show Value Counts", command=show_value_counts).pack(
+    pady=5
 )
-ttk.Button(root, text="Export Filtered Data", command=export_filtered_data).pack(
-    pady=10
-)
+ttk.Button(
+    button_frame, text="Summarize Missing Values", command=summarize_missing_values
+).pack(pady=5)
+ttk.Button(
+    button_frame, text="Group By and Aggregate", command=group_by_and_aggregate
+).pack(pady=5)
+ttk.Button(
+    button_frame, text="Export Filtered Data", command=export_filtered_data
+).pack(pady=5)
 
 # Global variable to store the dataframe and filtered dataframe
 df = None
