@@ -1,5 +1,3 @@
-# includes missingNo code
-
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import pandas as pd
@@ -15,6 +13,7 @@ def load_csv():
         global df
         df = pd.read_csv(file_path)
         messagebox.showinfo("Success", "CSV file loaded successfully!")
+        show_column_info()  # Show column info after loading
     else:
         messagebox.showwarning("Warning", "No file selected!")
 
@@ -24,7 +23,7 @@ def show_head():
     if df is not None:
         head_window = tk.Toplevel(root)
         head_window.title("First 5 Rows")
-        head_text = tk.Text(head_window, wrap=tk.NONE)
+        head_text = tk.Text(head_window, wrap=tk.NONE, bg="#333333", fg="#ffffff")
         head_text.insert(tk.END, df.head().to_string())
         head_text.pack(expand=True, fill=tk.BOTH)
     else:
@@ -36,7 +35,9 @@ def describe_data():
     if df is not None:
         describe_window = tk.Toplevel(root)
         describe_window.title("Dataset Description")
-        describe_text = tk.Text(describe_window, wrap=tk.NONE)
+        describe_text = tk.Text(
+            describe_window, wrap=tk.NONE, bg="#333333", fg="#ffffff"
+        )
         describe_text.insert(tk.END, df.describe().to_string())
         describe_text.pack(expand=True, fill=tk.BOTH)
     else:
@@ -55,7 +56,9 @@ def filter_rows():
                 filtered_df = df[df[column_name] == filter_value]
                 filter_window = tk.Toplevel(root)
                 filter_window.title("Filtered Rows")
-                filter_text = tk.Text(filter_window, wrap=tk.NONE)
+                filter_text = tk.Text(
+                    filter_window, wrap=tk.NONE, bg="#333333", fg="#ffffff"
+                )
                 filter_text.insert(tk.END, filtered_df.to_string())
                 filter_text.pack(expand=True, fill=tk.BOTH)
             else:
@@ -63,13 +66,19 @@ def filter_rows():
 
         filter_window = tk.Toplevel(root)
         filter_window.title("Filter Rows")
-        tk.Label(filter_window, text="Column Name:").pack()
-        column_entry = tk.Entry(filter_window)
+        tk.Label(filter_window, text="Column Name:", bg="#222222", fg="#ffffff").pack()
+        column_entry = tk.Entry(filter_window, bg="#444444", fg="#ffffff")
         column_entry.pack()
-        tk.Label(filter_window, text="Value:").pack()
-        value_entry = tk.Entry(filter_window)
+        tk.Label(filter_window, text="Value:", bg="#222222", fg="#ffffff").pack()
+        value_entry = tk.Entry(filter_window, bg="#444444", fg="#ffffff")
         value_entry.pack()
-        tk.Button(filter_window, text="Apply Filter", command=apply_filter).pack()
+        tk.Button(
+            filter_window,
+            text="Apply Filter",
+            command=apply_filter,
+            bg="#555555",
+            fg="#ffffff",
+        ).pack()
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
 
@@ -89,10 +98,12 @@ def plot_column():
 
         plot_window = tk.Toplevel(root)
         plot_window.title("Plot Column")
-        tk.Label(plot_window, text="Column Name:").pack()
-        column_entry = tk.Entry(plot_window)
+        tk.Label(plot_window, text="Column Name:", bg="#222222", fg="#ffffff").pack()
+        column_entry = tk.Entry(plot_window, bg="#444444", fg="#ffffff")
         column_entry.pack()
-        tk.Button(plot_window, text="Plot", command=apply_plot).pack()
+        tk.Button(
+            plot_window, text="Plot", command=apply_plot, bg="#555555", fg="#ffffff"
+        ).pack()
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
 
@@ -102,7 +113,7 @@ def show_correlation_matrix():
     if df is not None:
         corr_window = tk.Toplevel(root)
         corr_window.title("Correlation Matrix")
-        corr_text = tk.Text(corr_window, wrap=tk.NONE)
+        corr_text = tk.Text(corr_window, wrap=tk.NONE, bg="#333333", fg="#ffffff")
         corr_text.insert(tk.END, df.corr().to_string())
         corr_text.pack(expand=True, fill=tk.BOTH)
     else:
@@ -118,7 +129,9 @@ def show_value_counts():
             if column_name in df.columns:
                 counts_window = tk.Toplevel(root)
                 counts_window.title(f"Value Counts for {column_name}")
-                counts_text = tk.Text(counts_window, wrap=tk.NONE)
+                counts_text = tk.Text(
+                    counts_window, wrap=tk.NONE, bg="#333333", fg="#ffffff"
+                )
                 counts_text.insert(tk.END, df[column_name].value_counts().to_string())
                 counts_text.pack(expand=True, fill=tk.BOTH)
             else:
@@ -126,11 +139,15 @@ def show_value_counts():
 
         counts_window = tk.Toplevel(root)
         counts_window.title("Value Counts")
-        tk.Label(counts_window, text="Column Name:").pack()
-        column_entry = tk.Entry(counts_window)
+        tk.Label(counts_window, text="Column Name:", bg="#222222", fg="#ffffff").pack()
+        column_entry = tk.Entry(counts_window, bg="#444444", fg="#ffffff")
         column_entry.pack()
         tk.Button(
-            counts_window, text="Show Value Counts", command=apply_value_counts
+            counts_window,
+            text="Show Value Counts",
+            command=apply_value_counts,
+            bg="#555555",
+            fg="#ffffff",
         ).pack()
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
@@ -141,7 +158,7 @@ def summarize_missing_values():
     if df is not None:
         missing_window = tk.Toplevel(root)
         missing_window.title("Missing Values Summary")
-        missing_text = tk.Text(missing_window, wrap=tk.NONE)
+        missing_text = tk.Text(missing_window, wrap=tk.NONE, bg="#333333", fg="#ffffff")
         missing_text.insert(tk.END, df.isnull().sum().to_string())
         missing_text.pack(expand=True, fill=tk.BOTH)
     else:
@@ -160,7 +177,9 @@ def group_by_and_aggregate():
                 grouped_df = df.groupby(group_column)[agg_column].agg(agg_func)
                 groupby_window = tk.Toplevel(root)
                 groupby_window.title("Group By and Aggregate")
-                groupby_text = tk.Text(groupby_window, wrap=tk.NONE)
+                groupby_text = tk.Text(
+                    groupby_window, wrap=tk.NONE, bg="#333333", fg="#ffffff"
+                )
                 groupby_text.insert(tk.END, grouped_df.to_string())
                 groupby_text.pack(expand=True, fill=tk.BOTH)
             else:
@@ -170,16 +189,31 @@ def group_by_and_aggregate():
 
         groupby_window = tk.Toplevel(root)
         groupby_window.title("Group By and Aggregate")
-        tk.Label(groupby_window, text="Group By Column:").pack()
-        group_entry = tk.Entry(groupby_window)
+        tk.Label(
+            groupby_window, text="Group By Column:", bg="#222222", fg="#ffffff"
+        ).pack()
+        group_entry = tk.Entry(groupby_window, bg="#444444", fg="#ffffff")
         group_entry.pack()
-        tk.Label(groupby_window, text="Aggregate Column:").pack()
-        agg_entry = tk.Entry(groupby_window)
+        tk.Label(
+            groupby_window, text="Aggregate Column:", bg="#222222", fg="#ffffff"
+        ).pack()
+        agg_entry = tk.Entry(groupby_window, bg="#444444", fg="#ffffff")
         agg_entry.pack()
-        tk.Label(groupby_window, text="Aggregation Function (e.g., sum, mean):").pack()
-        agg_func_entry = tk.Entry(groupby_window)
+        tk.Label(
+            groupby_window,
+            text="Aggregation Function (e.g., sum, mean):",
+            bg="#222222",
+            fg="#ffffff",
+        ).pack()
+        agg_func_entry = tk.Entry(groupby_window, bg="#444444", fg="#ffffff")
         agg_func_entry.pack()
-        tk.Button(groupby_window, text="Apply Group By", command=apply_groupby).pack()
+        tk.Button(
+            groupby_window,
+            text="Apply Group By",
+            command=apply_groupby,
+            bg="#555555",
+            fg="#ffffff",
+        ).pack()
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
 
@@ -199,153 +233,165 @@ def export_filtered_data():
         messagebox.showwarning("Warning", "No filtered data to export!")
 
 
-# Reverse Calculator: Function to find combinations that sum to a target value
-def reverse_calculator():
+# Function to show current column names and data types
+def show_column_info():
     if df is not None:
-
-        def apply_reverse_calculator():
-            target_value = float(target_entry.get())
-            num_operands = int(num_operands_entry.get())
-            tolerance = float(tolerance_entry.get()) / 100
-
-            exclude_first = exclude_first_var.get()
-            columns = (
-                df.columns.tolist()[1:] if exclude_first == "y" else df.columns.tolist()
-            )
-            per_column = per_column_var.get() == "y"
-
-            finder = CombinationFinder(df, columns, per_column)
-            results = finder.find_combinations(target_value, num_operands, tolerance)
-            finder.display_results(results)
-
-        reverse_calc_window = tk.Toplevel(root)
-        reverse_calc_window.title("Reverse Calculator")
-
-        tk.Label(reverse_calc_window, text="Target Value:").pack()
-        target_entry = tk.Entry(reverse_calc_window)
-        target_entry.pack()
-
-        tk.Label(reverse_calc_window, text="Number of Operands (2 or 3):").pack()
-        num_operands_entry = tk.Entry(reverse_calc_window)
-        num_operands_entry.pack()
-
-        tk.Label(
-            reverse_calc_window, text="Tolerance Percentage (e.g., 10 for 10%):"
-        ).pack()
-        tolerance_entry = tk.Entry(reverse_calc_window)
-        tolerance_entry.pack()
-
-        exclude_first_var = tk.StringVar(value="y")
-        tk.Label(reverse_calc_window, text="Exclude First Column? (y/n):").pack()
-        tk.Entry(reverse_calc_window, textvariable=exclude_first_var).pack()
-
-        per_column_var = tk.StringVar(value="n")
-        tk.Label(reverse_calc_window, text="Search Per Column? (y/n):").pack()
-        tk.Entry(reverse_calc_window, textvariable=per_column_var).pack()
-
-        tk.Button(
-            reverse_calc_window,
-            text="Find Combinations",
-            command=apply_reverse_calculator,
-        ).pack()
+        column_info_text.delete(1.0, tk.END)  # Clear previous content
+        column_info_text.insert(tk.END, df.dtypes.to_string())
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
 
 
-# Reverse Calculator: Supporting classes
-class CombinationFinder:
-    def __init__(self, dataframe, columns=None, per_column=False):
-        self.df = dataframe
-        self.per_column = per_column
-        if columns:
-            self.df = self.df[columns]
+# Reverse calculator function to find combinations
+def run_reverse_calculator():
+    output_text.delete(1.0, tk.END)
+    try:
+        target = float(target_entry.get())
+        num_operands = int(operands_entry.get())
+        tolerance = float(tolerance_entry.get()) / 100
+        finder = CombinationFinder(
+            df, columns_to_use, settings["Search per column"].lower() == "y"
+        )
+        results = finder.find_combinations(target, num_operands, tolerance)
+        display_results(results)
+    except ValueError:
+        output_text.insert(tk.END, "Invalid input. Please enter valid numbers.\n")
 
-    def find_combinations(self, target_value, num_operands, tolerance):
-        results = []
-        if self.per_column:
-            for col in self.df.columns:
-                results.extend(
-                    self._find_combinations_in_column(
-                        target_value, num_operands, tolerance, col
-                    )
-                )
-        else:
-            results.extend(
-                self._find_combinations_across_columns(
-                    target_value, num_operands, tolerance
-                )
-            )
-        return results
 
-    def _find_combinations_in_column(self, target_value, num_operands, tolerance, col):
-        entries = [(idx, row[col]) for idx, row in self.df.iterrows()]
-        results = []
-        for combo in combinations(entries, num_operands):
-            sum_val = sum(item[1] for item in combo)
-            if abs(sum_val - target_value) <= tolerance * target_value:
-                result_entry = {"column": col, "sum": sum_val}
-                for i, (index, value) in enumerate(combo):
-                    result_entry[f"index{i+1}"] = index
-                    result_entry[f"value{i+1}"] = value
-                results.append(result_entry)
-        return results
+# Helper functions for reverse calculator
+def display_results(results):
+    if results:
+        output_text.insert(tk.END, "~~~~~~~~~~ Matches Found ~~~~~~~~~~\n")
+        output_text.insert(tk.END, pd.DataFrame(results).to_string() + "\n")
+    else:
+        output_text.insert(tk.END, "~~~ None Found Within Tolerance ~~~\n")
 
-    def _find_combinations_across_columns(self, target_value, num_operands, tolerance):
-        entries = [
-            (idx, row[col])
-            for idx, row in self.df.iterrows()
-            for col in self.df.columns
-        ]
-        results = []
-        for combo in combinations(entries, num_operands):
-            sum_val = sum(item[1] for item in combo)
-            if abs(sum_val - target_value) <= tolerance * target_value:
-                result_entry = {"sum": sum_val}
-                for i, (index, value) in enumerate(combo):
-                    result_entry[f"index{i+1}"] = index
-                    result_entry[f"value{i+1}"] = value
-                results.append(result_entry)
-        return results
 
-    def display_results(self, results):
-        if results:
-            results_window = tk.Toplevel(root)
-            results_window.title("Combination Results")
-            results_text = tk.Text(results_window, wrap=tk.NONE)
-            results_text.insert(tk.END, pd.DataFrame(results).to_string())
-            results_text.pack(expand=True, fill=tk.BOTH)
-        else:
-            messagebox.showinfo("Info", "No combinations found within tolerance.")
+def list_columns(df, settings):
+    exclude_first = settings["Exclude first column"]
+    columns_to_use = (
+        df.columns.tolist()[1:] if exclude_first.lower() == "y" else df.columns.tolist()
+    )
+    output_text.insert(
+        tk.END, "Available columns for analysis: " + str(columns_to_use) + "\n"
+    )
+
+
+def handle_settings_menu(settings):
+    output_text.insert(tk.END, "\n~~~~~~ Settings Menu ~~~~~~\n")
+    for letter, (key, value) in zip("abcdef", settings.items()):
+        output_text.insert(tk.END, f"{letter.upper()}. {key}: {value}\n")
+    output_text.insert(tk.END, "Settings can be adjusted within the code for now.\n")
 
 
 # Create main application window with macOS aesthetic
-root = ThemedTk(theme="aquativo")
+root = ThemedTk(theme="black")
 root.title("Data Analysis Swiss Army Tool")
-root.geometry("400x700")
+root.geometry("900x900")
+
+# Create a frame for the column info
+column_info_frame = tk.Frame(root, bg="#222222")
+column_info_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+# Label for column info section
+tk.Label(
+    column_info_frame, text="Column Names and Data Types:", bg="#222222", fg="#ffffff"
+).pack()
+
+# Text widget for displaying column names and data types
+column_info_text = tk.Text(
+    column_info_frame, wrap=tk.NONE, height=10, bg="#333333", fg="#ffffff"
+)
+column_info_text.pack(expand=True, fill=tk.BOTH)
 
 # Buttons for the different tools
-ttk.Button(root, text="Load CSV", command=load_csv).pack(pady=10)
-ttk.Button(root, text="Show First 5 Rows", command=show_head).pack(pady=10)
-ttk.Button(root, text="Describe Dataset", command=describe_data).pack(pady=10)
-ttk.Button(root, text="Filter Rows", command=filter_rows).pack(pady=10)
-ttk.Button(root, text="Plot Column", command=plot_column).pack(pady=10)
-ttk.Button(root, text="Show Correlation Matrix", command=show_correlation_matrix).pack(
-    pady=10
-)
-ttk.Button(root, text="Show Value Counts", command=show_value_counts).pack(pady=10)
+button_frame = tk.Frame(root, bg="#222222")
+button_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+ttk.Button(button_frame, text="Load CSV", command=load_csv).pack(pady=5)
+ttk.Button(button_frame, text="Show First 5 Rows", command=show_head).pack(pady=5)
+ttk.Button(button_frame, text="Describe Dataset", command=describe_data).pack(pady=5)
+ttk.Button(button_frame, text="Filter Rows", command=filter_rows).pack(pady=5)
+ttk.Button(button_frame, text="Plot Column", command=plot_column).pack(pady=5)
 ttk.Button(
-    root, text="Summarize Missing Values", command=summarize_missing_values
+    button_frame, text="Show Correlation Matrix", command=show_correlation_matrix
+).pack(pady=5)
+ttk.Button(button_frame, text="Show Value Counts", command=show_value_counts).pack(
+    pady=5
+)
+ttk.Button(
+    button_frame, text="Summarize Missing Values", command=summarize_missing_values
+).pack(pady=5)
+ttk.Button(
+    button_frame, text="Group By and Aggregate", command=group_by_and_aggregate
+).pack(pady=5)
+ttk.Button(
+    button_frame, text="Export Filtered Data", command=export_filtered_data
+).pack(pady=5)
+
+# Frame for Reverse Calculator Section
+reverse_calculator_frame = tk.Frame(root, bg="#222222")
+reverse_calculator_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+# Label for the Reverse Calculator section
+tk.Label(
+    reverse_calculator_frame,
+    text="Reverse Calculator",
+    bg="#222222",
+    fg="#ffffff",
+    font=("Helvetica", 16),
+).pack(pady=5)
+
+# Target value input
+tk.Label(
+    reverse_calculator_frame, text="Target Value:", bg="#222222", fg="#ffffff"
+).pack()
+target_entry = tk.Entry(reverse_calculator_frame, bg="#333333", fg="#ffffff")
+target_entry.pack(fill=tk.X)
+
+# Number of operands input
+tk.Label(
+    reverse_calculator_frame, text="Number of Operands:", bg="#222222", fg="#ffffff"
+).pack()
+operands_entry = tk.Entry(reverse_calculator_frame, bg="#333333", fg="#ffffff")
+operands_entry.pack(fill=tk.X)
+
+# Tolerance percentage input
+tk.Label(
+    reverse_calculator_frame, text="Tolerance Percentage:", bg="#222222", fg="#ffffff"
+).pack()
+tolerance_entry = tk.Entry(reverse_calculator_frame, bg="#333333", fg="#ffffff")
+tolerance_entry.pack(fill=tk.X)
+
+# Button to run reverse calculator
+tk.Button(
+    reverse_calculator_frame,
+    text="Run Reverse Calculator",
+    command=run_reverse_calculator,
+    bg="#555555",
+    fg="#ffffff",
 ).pack(pady=10)
-ttk.Button(root, text="Group By and Aggregate", command=group_by_and_aggregate).pack(
-    pady=10
+
+# Textbox for displaying output
+output_text = tk.Text(
+    reverse_calculator_frame, wrap=tk.NONE, height=10, bg="#333333", fg="#ffffff"
 )
-ttk.Button(root, text="Export Filtered Data", command=export_filtered_data).pack(
-    pady=10
-)
-ttk.Button(root, text="Reverse Calculator", command=reverse_calculator).pack(pady=10)
+output_text.pack(expand=True, fill=tk.BOTH)
 
 # Global variable to store the dataframe and filtered dataframe
 df = None
 filtered_df = None
+
+# Settings for reverse calculator
+settings = {
+    "Exclude first column": "y",
+    "Columns to use": "",
+    "Search per column": "n",
+    "Target value": "1000",
+    "Number of operands": "2",
+    "Tolerance percentage": "10",
+}
+
+columns_to_use = []
 
 root.mainloop()
