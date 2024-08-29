@@ -2,7 +2,11 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from ttkthemes import ThemedTk
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
 from itertools import combinations
 
 
@@ -113,9 +117,12 @@ def show_correlation_matrix():
     if df is not None:
         corr_window = tk.Toplevel(root)
         corr_window.title("Correlation Matrix")
-        corr_text = tk.Text(corr_window, wrap=tk.NONE, bg="#333333", fg="#ffffff")
-        corr_text.insert(tk.END, df.corr().to_string())
-        corr_text.pack(expand=True, fill=tk.BOTH)
+        corr_fig = plt.Figure(figsize=(10, 8))
+        ax = corr_fig.add_subplot(111)
+        sns.heatmap(df.corr(), annot=True, cmap="coolwarm", ax=ax)
+        canvas = tk.Canvas(corr_window)
+        canvas.pack(expand=True, fill=tk.BOTH)
+        plt.show()
     else:
         messagebox.showwarning("Warning", "Load a CSV file first!")
 
@@ -218,6 +225,76 @@ def group_by_and_aggregate():
         messagebox.showwarning("Warning", "Load a CSV file first!")
 
 
+# Function to perform linear regression
+def linear_regression_tool():
+    if df is not None:
+
+        def apply_regression():
+            try:
+                x_columns = x_entry.get().split(",")
+                y_column = y_entry.get()
+
+                if (
+                    all(col in df.columns for col in x_columns)
+                    and y_column in df.columns
+                ):
+                    X = df[x_columns].values
+                    y = df[y_column].values
+
+                    X_train, X_test, y_train, y_test = train_test_split(
+                        X, y, test_size=0.3, random_state=42
+                    )
+                    model = LinearRegression()
+                    model.fit(X_train, y_train)
+                    y_pred = model.predict(X_test)
+
+                    regression_window = tk.Toplevel(root)
+                    regression_window.title("Linear Regression Results")
+                    regression_text = tk.Text(
+                        regression_window, wrap=tk.NONE, bg="#333333", fg="#ffffff"
+                    )
+
+                    regression_text.insert(tk.END, "Coefficients:\n")
+                    regression_text.insert(tk.END, f"{model.coef_}\n\n")
+                    regression_text.insert(tk.END, "Intercept:\n")
+                    regression_text.insert(tk.END, f"{model.intercept_}\n\n")
+                    regression_text.insert(tk.END, "Mean Squared Error:\n")
+                    regression_text.insert(
+                        tk.END, f"{mean_squared_error(y_test, y_pred)}\n\n"
+                    )
+                    regression_text.insert(tk.END, "R^2 Score:\n")
+                    regression_text.insert(tk.END, f"{r2_score(y_test, y_pred)}\n\n")
+                    regression_text.pack(expand=True, fill=tk.BOTH)
+
+                else:
+                    messagebox.showwarning("Warning", "Invalid columns specified!")
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred: {e}")
+
+        regression_window = tk.Toplevel(root)
+        regression_window.title("Linear Regression Tool")
+        tk.Label(
+            regression_window,
+            text="X Columns (comma-separated):",
+            bg="#222222",
+            fg="#ffffff",
+        ).pack()
+        x_entry = tk.Entry(regression_window, bg="#444444", fg="#ffffff")
+        x_entry.pack()
+        tk.Label(regression_window, text="Y Column:", bg="#222222", fg="#ffffff").pack()
+        y_entry = tk.Entry(regression_window, bg="#444444", fg="#ffffff")
+        y_entry.pack()
+        tk.Button(
+            regression_window,
+            text="Run Regression",
+            command=apply_regression,
+            bg="#555555",
+            fg="#ffffff",
+        ).pack()
+    else:
+        messagebox.showwarning("Warning", "Load a CSV file first!")
+
+
 # Function to export filtered data
 def export_filtered_data():
     if filtered_df is not None:
@@ -287,7 +364,7 @@ def handle_settings_menu(settings):
 # Create main application window with macOS aesthetic
 root = ThemedTk(theme="black")
 root.title("Data Analysis Swiss Army Tool")
-root.geometry("900x900")
+root.geometry("1000x1000")
 
 # Create a frame for the column info
 column_info_frame = tk.Frame(root, bg="#222222")
@@ -304,30 +381,28 @@ column_info_text = tk.Text(
 )
 column_info_text.pack(expand=True, fill=tk.BOTH)
 
-# Buttons for the different tools
+# Buttons for the different tools organized in a grid layout
 button_frame = tk.Frame(root, bg="#222222")
 button_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-ttk.Button(button_frame, text="Load CSV", command=load_csv).pack(pady=5)
-ttk.Button(button_frame, text="Show First 5 Rows", command=show_head).pack(pady=5)
-ttk.Button(button_frame, text="Describe Dataset", command=describe_data).pack(pady=5)
-ttk.Button(button_frame, text="Filter Rows", command=filter_rows).pack(pady=5)
-ttk.Button(button_frame, text="Plot Column", command=plot_column).pack(pady=5)
-ttk.Button(
-    button_frame, text="Show Correlation Matrix", command=show_correlation_matrix
-).pack(pady=5)
-ttk.Button(button_frame, text="Show Value Counts", command=show_value_counts).pack(
-    pady=5
-)
-ttk.Button(
-    button_frame, text="Summarize Missing Values", command=summarize_missing_values
-).pack(pady=5)
-ttk.Button(
-    button_frame, text="Group By and Aggregate", command=group_by_and_aggregate
-).pack(pady=5)
-ttk.Button(
-    button_frame, text="Export Filtered Data", command=export_filtered_data
-).pack(pady=5)
+buttons = [
+    ("Load CSV", load_csv),
+    ("Show First 5 Rows", show_head),
+    ("Describe Dataset", describe_data),
+    ("Filter Rows", filter_rows),
+    ("Plot Column", plot_column),
+    ("Show Correlation Matrix", show_correlation_matrix),
+    ("Show Value Counts", show_value_counts),
+    ("Summarize Missing Values", summarize_missing_values),
+    ("Group By and Aggregate", group_by_and_aggregate),
+    ("Linear Regression Tool", linear_regression_tool),
+    ("Export Filtered Data", export_filtered_data),
+]
+
+for i, (text, command) in enumerate(buttons):
+    ttk.Button(button_frame, text=text, command=command).grid(
+        row=i // 3, column=i % 3, padx=5, pady=5
+    )
 
 # Frame for Reverse Calculator Section
 reverse_calculator_frame = tk.Frame(root, bg="#222222")
